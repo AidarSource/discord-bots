@@ -4,8 +4,10 @@ from discord.ext import tasks
 from algorithms.obslang_detect import check_slang
 from algorithms.serverStatus import status, max_players
 from data import get_data, get_exception, get_block, set_data, set_exception, set_block
+from replics import media_replics, link_replics
 import re
 import json
+import random
 
 # prefix for bot commands
 bot = commands.Bot(command_prefix='!')
@@ -29,17 +31,17 @@ async def voice_renamer():
     public_server = 'https://www.gametracker.com/server_info/37.230.137.168:27018/'
     try:
         # getting voice-channel id of first server
-        ze_channel = await bot.fetch_channel(737975607710711890)
+        ze_channel = await bot.fetch_channel(739222175424184380)
         await ze_channel.edit(name=f'\U0001F4DC ZE: {status(ze_server)}/{max_players(ze_server)}')
         # getting voice-channel id of second server
-        bhop = await bot.fetch_channel(738434359362584607)
+        bhop = await bot.fetch_channel(739222222761230396)
         await bhop.edit(name=f'\U0001F4DC Bhop: {status(bhop_server)}/{max_players(bhop_server)}')
         # getting voice-channel id of third server
-        arena = await bot.fetch_channel(738434416925343754)
+        arena = await bot.fetch_channel(739222247037730887)
         await arena.edit(name=f'\U0001F4DC Arena: {status(arena_server)}/{max_players(arena_server)}')
         # getting voice-channel id of fourth server
-        mg = await bot.fetch_channel(738434454900441139)
-        await mg.edit(name=f'\U0001F4DC Public: {status(public_server)}/{max_players(public_server)}')
+        public = await bot.fetch_channel(766412800561774592)
+        await public.edit(name=f'\U0001F4DC Public: {status(public_server)}/{max_players(public_server)}')
     # shows a error when function get trouble in renaming voice-channels
     except Exception as e:
         print(e)
@@ -168,15 +170,25 @@ async def on_message(message):
 
     for element in data:
         if element == message.channel.id:
-            if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$', message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub).(com|nl|tv|be)', message.content):
-                await message.delete()
-                await message.author.send('Your media file is restricted in this text-channel, you can send your file to #media channel \U0001f920 \nВаш медиа файл заблокирован в данном текстовом канале, вы можете отправить этот файл в #media \U0001f920')
+            try:
+                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$', message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub).(com|nl|tv|be)', message.content):
+                    await message.delete()
+                    await message.channel.send(f"{message.author.mention} {random.choice(link_replics)}")
+                    media = bot.get_channel(521254726021677056)
+                    await media.send(str(message.author) + ": " + str(message.content))
+                    await media.send(message.attachments[0].url)
+            except IndexError:
+                break
+
 
     for element in data:
         if element == message.channel.id:
             try:
                 if message.attachments[0].height:
-                    await message.author.send('Your media file is restricted in this text-channel, you can send your file to #media channel \U0001f920 \nВаш медиа файл заблокирован в данном текстовом канале, вы можете отправить этот файл в #media \U0001f920')
+                    await message.channel.send(f"{message.author.mention} {random.choice(media_replics)}")
+                    media = bot.get_channel(521254726021677056)
+                    await media.send(str(message.author) + ": " + str(message.content))
+                    await media.send(message.attachments[0].url)
                     await message.delete()
                     break
             except IndexError:
