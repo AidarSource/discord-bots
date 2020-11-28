@@ -1,6 +1,7 @@
 # coding=utf8
 from discord.ext import commands
 from discord.ext import tasks
+from discord import Embed
 from algorithms.obslang_detect import check_slang
 from algorithms.serverStatus import status, max_players
 from data import get_data, get_exception, get_block, set_data, set_exception, set_block
@@ -171,12 +172,11 @@ async def on_message(message):
     for element in data:
         if element == message.channel.id:
             try:
-                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$', message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub).(com|nl|tv|be)', message.content):
+                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$', message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub|imgur|prnt).(com|nl|tv|be|sc)', message.content):
                     await message.delete()
                     await message.channel.send(f"{message.author.mention} {random.choice(link_replics)}")
                     media = bot.get_channel(521254726021677056)
                     await media.send(str(message.author) + ": " + str(message.content))
-                    await media.send(message.attachments[0].url)
             except IndexError:
                 break
 
@@ -187,8 +187,9 @@ async def on_message(message):
                 if message.attachments[0].height:
                     await message.channel.send(f"{message.author.mention} {random.choice(media_replics)}")
                     media = bot.get_channel(521254726021677056)
-                    await media.send(str(message.author) + ": " + str(message.content))
-                    await media.send(message.attachments[0].url)
+                    embed = Embed(title=str(message.author) + ": ", description=str(message.content), color=0xff0000)
+                    embed.set_image(url=message.attachments[0].url)
+                    await media.send(embed=embed)
                     await message.delete()
                     break
             except IndexError:
