@@ -30,20 +30,32 @@ async def voice_renamer():
     bhop_server = 'https://www.gametracker.com/server_info/37.230.137.168:27016/'
     arena_server = 'https://www.gametracker.com/server_info/37.230.137.168:27017/'
     public_server = 'https://www.gametracker.com/server_info/37.230.137.168:27018/'
+    
     try:
         # getting voice-channel id of first server
         ze_channel = await bot.fetch_channel(739222175424184380)
         await ze_channel.edit(name=f'\U0001F4DC ZE: {status(ze_server)}/{max_players(ze_server)}')
+    except Exception as e:
+        print(e)
+        
+    try:
         # getting voice-channel id of second server
         bhop = await bot.fetch_channel(739222222761230396)
         await bhop.edit(name=f'\U0001F4DC Bhop: {status(bhop_server)}/{max_players(bhop_server)}')
+    except Exception as e:
+        print(e)
+    
+    try:
         # getting voice-channel id of third server
         arena = await bot.fetch_channel(739222247037730887)
         await arena.edit(name=f'\U0001F4DC Arena: {status(arena_server)}/{max_players(arena_server)}')
+    except Exception as e:
+        print(e)
+    
+    try:
         # getting voice-channel id of fourth server
         public = await bot.fetch_channel(766412800561774592)
         await public.edit(name=f'\U0001F4DC Public: {status(public_server)}/{max_players(public_server)}')
-    # shows a error when function get trouble in renaming voice-channels
     except Exception as e:
         print(e)
 
