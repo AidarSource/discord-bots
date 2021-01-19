@@ -3,9 +3,10 @@ from discord.ext import commands
 from discord.ext import tasks
 from discord import Embed
 from algorithms.obslang_detect import check_slang
-from algorithms.serverStatus import status, max_players
+from algorithms.serverStatus import status, max_players, current_map
 from data import get_data, get_exception, get_block, set_data, set_exception, set_block
 from replics import media_replics, link_replics
+from time import sleep
 import re
 import json
 import random
@@ -18,8 +19,53 @@ bot = commands.Bot(command_prefix='!')
 async def on_ready():
     print(f'We have logged in as {bot.user}.')
 
-    # this activates loop for renaming voice-channels
+    # this activates loop for renaming voice-channels of server status
     voice_renamer.start()
+    # this activates loop for map-tracking in voice-channels
+    map_tracker.start()
+
+
+# nickname map-tracker for voice-channels
+@tasks.loop(seconds=1)
+async def map_tracker():
+    # getting voice-channels that we want to join
+    ze_channel = bot.get_channel(739222175424184380)
+    bhop_channel = bot.get_channel(739222222761230396)
+    arena_channel = bot.get_channel(739222247037730887)
+    public_channel = bot.get_channel(766412800561774592)
+
+    # change web-links if you want to change to your server
+    ze_server = 'https://www.gametracker.com/server_info/37.230.137.168:27015/'
+    bhop_server = 'https://www.gametracker.com/server_info/37.230.137.168:27016/'
+    arena_server = 'https://www.gametracker.com/server_info/37.230.137.168:27017/'
+    public_server = 'https://www.gametracker.com/server_info/37.230.137.168:27018/'
+
+    # getting discord server
+    for guild in bot.guilds:
+        # checking the bot for being in the voice channel
+        if guild.voice_client is not None:
+            # disconnect from all voice-channels
+            await guild.voice_client.disconnect()
+        # getting current map of the server
+        await guild.me.edit(nick=current_map(ze_server))
+        # connect to the voice-channel
+        await ze_channel.connect()
+        sleep(0.25)
+
+        await guild.voice_client.disconnect()
+        await guild.me.edit(nick=current_map(bhop_server))
+        await bhop_channel.connect()
+        sleep(0.25)
+
+        await guild.voice_client.disconnect()
+        await guild.me.edit(nick=current_map(arena_server))
+        await arena_channel.connect()
+        sleep(0.25)
+
+        await guild.voice_client.disconnect()
+        await guild.me.edit(nick=current_map(public_server))
+        await public_channel.connect()
+        sleep(0.25)
 
 
 # renames 4 voice-channels for actual gaming servers of discord server
@@ -30,28 +76,28 @@ async def voice_renamer():
     bhop_server = 'https://www.gametracker.com/server_info/37.230.137.168:27016/'
     arena_server = 'https://www.gametracker.com/server_info/37.230.137.168:27017/'
     public_server = 'https://www.gametracker.com/server_info/37.230.137.168:27018/'
-    
+
     try:
         # getting voice-channel id of first server
         ze_channel = await bot.fetch_channel(739222175424184380)
         await ze_channel.edit(name=f'\U0001F4DC ZE: {status(ze_server)}/{max_players(ze_server)}')
     except Exception as e:
         print(e)
-        
+
     try:
         # getting voice-channel id of second server
         bhop = await bot.fetch_channel(739222222761230396)
         await bhop.edit(name=f'\U0001F4DC Bhop: {status(bhop_server)}/{max_players(bhop_server)}')
     except Exception as e:
         print(e)
-    
+
     try:
         # getting voice-channel id of third server
         arena = await bot.fetch_channel(739222247037730887)
         await arena.edit(name=f'\U0001F4DC Arena: {status(arena_server)}/{max_players(arena_server)}')
     except Exception as e:
         print(e)
-    
+
     try:
         # getting voice-channel id of fourth server
         public = await bot.fetch_channel(766412800561774592)
@@ -129,7 +175,7 @@ async def systemcall_addexception(ctx):
     words = get_exception()
     words.append(ctx.message.content[25:])
     set_exception(words)
-    
+
     await ctx.send('\U0001f5f3 Your word successfully added to exception list.')
 
 
@@ -179,19 +225,22 @@ async def on_message(message):
                 await message.delete()
                 log = bot.get_channel(604351997646471218)
                 await log.send(f'KGB Report \U0001f4f3 {message.author}: {message.content}')
-                await message.author.send('Obscene language was detected, please do not use banned words in this channel \U0001f31d \nОбнаружена нецензурная лексика, искренне вас просим не использовать запрещенные слова \U0001f31d')
+                await message.author.send(
+                    'Obscene language was detected, please do not use banned words in this channel \U0001f31d \nОбнаружена нецензурная лексика, искренне вас просим не использовать запрещенные слова \U0001f31d')
 
     for element in data:
         if element == message.channel.id:
             try:
-                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$', message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub|imgur|prnt).(com|nl|tv|be|sc)', message.content):
+                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search(
+                        '^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$',
+                        message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub|imgur|prnt).(com|nl|tv|be|sc)',
+                                                      message.content):
                     await message.delete()
                     await message.channel.send(f"{message.author.mention} {random.choice(link_replics)}")
                     media = bot.get_channel(521254726021677056)
                     await media.send(str(message.author) + ": " + str(message.content))
             except IndexError:
                 break
-
 
     for element in data:
         if element == message.channel.id:
