@@ -22,50 +22,6 @@ async def on_ready():
     # this activates loop for renaming voice-channels of server status
     voice_renamer.start()
     # this activates loop for map-tracking in voice-channels
-    map_tracker.start()
-
-
-# nickname map-tracker for voice-channels
-@tasks.loop(seconds=1)
-async def map_tracker():
-    # getting voice-channels that we want to join
-    ze_channel = bot.get_channel(739222175424184380)
-    bhop_channel = bot.get_channel(739222222761230396)
-    arena_channel = bot.get_channel(739222247037730887)
-    public_channel = bot.get_channel(766412800561774592)
-
-    # change web-links if you want to change to your server
-    ze_server = 'https://www.gametracker.com/server_info/37.230.137.168:27015/'
-    bhop_server = 'https://www.gametracker.com/server_info/37.230.137.168:27016/'
-    arena_server = 'https://www.gametracker.com/server_info/37.230.137.168:27017/'
-    public_server = 'https://www.gametracker.com/server_info/37.230.137.168:27018/'
-
-    # getting discord server
-    for guild in bot.guilds:
-        # checking the bot for being in the voice channel
-        if guild.voice_client is not None:
-            # disconnect from all voice-channels
-            await guild.voice_client.disconnect()
-        # getting current map of the server
-        await guild.me.edit(nick=current_map(ze_server))
-        # connect to the voice-channel
-        await ze_channel.connect()
-        sleep(0.25)
-
-        await guild.voice_client.disconnect()
-        await guild.me.edit(nick=current_map(bhop_server))
-        await bhop_channel.connect()
-        sleep(0.25)
-
-        await guild.voice_client.disconnect()
-        await guild.me.edit(nick=current_map(arena_server))
-        await arena_channel.connect()
-        sleep(0.25)
-
-        await guild.voice_client.disconnect()
-        await guild.me.edit(nick=current_map(public_server))
-        await public_channel.connect()
-        sleep(0.25)
 
 
 # renames 4 voice-channels for actual gaming servers of discord server
