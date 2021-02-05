@@ -187,7 +187,7 @@ async def on_message(message):
     for element in data:
         if element == message.channel.id:
             try:
-                if re.search('https?://.*.(?:png|jpg|gif|jpeg)', message.content) or re.search(
+                if re.search('https?://.*.(?:png|jpg|gif|jpeg|mp4|mp3|wav|webm)', message.content) or re.search(
                         '^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$',
                         message.content) or re.search('(http(s|)://|)(www.|)(twitch|coub|imgur|prnt).(com|nl|tv|be|sc)',
                                                       message.content):
