@@ -8,6 +8,4 @@ def check_slang(string):
     new_expr = r'(?:\b|(?<=_))(?:' + expr + r')(?:\b|(?=_))'
     p = re.compile(new_expr, re.IGNORECASE)
     match = p.search(string)
-    if match:
-        return True
-    return False
+    return bool(match)
