@@ -202,11 +202,10 @@ async def on_message(message):
         if element == message.channel.id:
             try:
                 if message.attachments[0].height:
+                    _file = await message.attachments[0].to_file()
                     await message.channel.send(f"{message.author.mention} {random.choice(media_replics)}")
                     media = bot.get_channel(521254726021677056)
-                    embed = Embed(title=str(message.author) + ": ", description=str(message.content), color=0xff0000)
-                    embed.set_image(url=message.attachments[0].url)
-                    await media.send(embed=embed)
+                    await media.send(f"{str(message.author)}: {str(message.content)}", file=_file)
                     await message.delete()
                     break
             except IndexError:
